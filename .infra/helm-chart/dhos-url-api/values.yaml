@@ -1,0 +1,28 @@
+image:
+  acr:
+    api: sensynehealth.azurecr.io/dhos/dhos-url-api
+    dbinit: sensynehealth.azurecr.io/dhos/dhos-db-init
+  gcr:
+    api: gcr.io/dhos-stack/dhos-url-api
+    dbinit: gcr.io/dhos-stack/dhos-db-init
+
+pull_images_from: acr
+
+default_replicas:
+  api: 2
+
+db_init_imagetag: 0.1.22
+utilsVersion: 0.1.27
+
+labels:
+  sh/group: polaris
+  sh/component: url
+  sh/tier: back
+  sh/database: postgres
+
+redis_installed: false
+
+ingress:
+  enabled: false
+  annotations: {}
+  hostName: ""

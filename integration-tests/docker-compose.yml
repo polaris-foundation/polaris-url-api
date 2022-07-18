@@ -1,0 +1,66 @@
+x-environment:
+  &COMMON_ENVIRONMENT
+  ENVIRONMENT: DEVELOPMENT
+  PROXY_URL: http://localhost
+  DATABASE_HOST: dhos-url-api-db
+  DATABASE_PORT: 5432
+  DATABASE_USER: dhos-url-api-db
+  DATABASE_PASSWORD: dhos-url-api-db
+  DATABASE_NAME: dhos-url-api-db
+  CUSTOMER_CODE: DEV
+  LOG_LEVEL: DEBUG
+  LOG_FORMAT: COLOUR
+  SERVER_TIMEZONE: Europe/London
+
+services:
+  dhos-url-integration-tests:
+    container_name: "dhos-url-integration-tests"
+    build:
+      context: ./
+      args:
+        - PIP_EXTRA_INDEX_URL
+    environment:
+      <<: *COMMON_ENVIRONMENT
+      BEHAVE_ARGS: ${BEHAVE_ARGS:-}
+      REPORT_PORTAL_URL: ${REPORT_PORTAL_URL:-}
+      REPORT_PORTAL_TOKEN: ${REPORT_PORTAL_TOKEN:-}
+      REPORT_PORTAL_PROJECT: ${REPORT_PORTAL_PROJECT:-}
+      ENVIRONMENT: ${ENVIRONMENT:-}
+      RELEASE: ${RELEASE:-}
+    command: >
+      bash -c "behave --no-capture --no-logcapture ${BEHAVE_ARGS:-}"
+    depends_on:
+      "dhos-url-api":
+        condition: service_healthy
+
+  dhos-url-api:
+    container_name: "dhos-url-api"
+    build:
+      context: ..
+      args:
+        - GEMFURY_DOWNLOAD_KEY
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    command: >-
+      bash -c "flask db upgrade && python -m dhos_url_api"
+    healthcheck:
+      test: curl -f http://localhost:5000/running || false
+      interval: 3s
+      retries: 40
+      start_period: 10s
+    depends_on:
+      "dhos-url-api-db":
+        condition: service_healthy
+
+  dhos-url-api-db:
+    container_name: "dhos-url-api-db"
+    image: docker.io/postgres
+    environment:
+      POSTGRES_USER: dhos-url-api-db
+      POSTGRES_DB: dhos-url-api-db
+      POSTGRES_PASSWORD: dhos-url-api-db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 2s
+      timeout: 5s
+      retries: 20

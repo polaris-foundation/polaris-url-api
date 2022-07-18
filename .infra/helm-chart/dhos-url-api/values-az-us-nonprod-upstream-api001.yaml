@@ -1,0 +1,20 @@
+database:
+  dbhost: us-nonprod-upstream-api001-tomcat-db.postgres.database.azure.com
+  dbport: 5432
+  db_user_name: dhos-url@us-nonprod-upstream-api001-tomcat-db
+  db_su_name: postgres@us-nonprod-upstream-api001-tomcat-db
+  db_name: dhos-url
+
+imagePullPolicy: IfNotPresent
+imagetag: r1.12.0
+
+proxy_url: https://api-us-nonprod.sensynehealth.com
+environment: NONPRODUCTION
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: /dhos-url
+  hostName: api-nonprod.sensynehealth.local

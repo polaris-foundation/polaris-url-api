@@ -1,0 +1,9 @@
+assertpy==1.*
+behave
+black
+environs
+faker
+isort
+mypy
+reportportal-behave-client==1.*
+requests==2.*

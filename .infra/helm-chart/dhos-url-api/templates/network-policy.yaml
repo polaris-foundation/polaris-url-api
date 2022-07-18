@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dhos-url-api-np
+spec:
+  podSelector:
+    matchLabels:
+      app: dhos-url-api
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              customer: dhos-mgmt

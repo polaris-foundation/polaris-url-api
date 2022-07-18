@@ -1,0 +1,25 @@
+## Dev values
+database:
+  dbhost: uk-dev-api-upstream-quail-db.postgres.database.azure.com
+  dbport: 5432
+  db_user_name: dhos-url@uk-dev-api-upstream-quail-db
+  db_su_name: postgres@uk-dev-api-upstream-quail-db
+  db_name: dhos-url
+
+proxy_url: https://api-uk-dev.sensynehealth.com
+environment: DEVELOPMENT
+log_level: DEBUG
+
+imagePullPolicy: Always
+imagetag: dev
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: 'on'
+    nginx.ingress.kubernetes.io/auth-tls-secret: 'dhos-mgmt/internal-mtls-cert'
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: '2'
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: /dhos-url
+  hostName: api-dev.sensynehealth.local

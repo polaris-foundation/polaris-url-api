@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dhos-url-api-cm
+  labels:
+    app: dhos-url-api
+data:
+  DATABASE_HOST: {{ .Values.database.dbhost }}
+  DATABASE_PORT: "{{.Values.database.dbport}}"
+  DATABASE_USER: {{ .Values.database.db_user_name }}
+  DATABASE_NAME: {{ .Values.database.db_name }}
+  DATABASE_SU_USER: {{ .Values.database.db_su_name }}
+  REDIS_INSTALLED: "{{.Values.redis_installed}}"
+  PROXY_URL: "{{.Values.proxy_url}}"
+  ENVIRONMENT: "{{.Values.environment}}"
+  LOG_LEVEL: {{ .Values.log_level | default "INFO" }}

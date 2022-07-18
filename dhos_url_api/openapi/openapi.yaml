@@ -1,0 +1,183 @@
+openapi: 3.0.3
+info:
+  description: The DHOS URL API is responsible for shortening URLs and allowing their
+    retrieval.
+  title: DHOS URL API
+  version: 1.0.0
+paths:
+  /running:
+    get:
+      summary: Verify service is running
+      description: Verifies that the service is running. Used for monitoring in kubernetes.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: If we respond, we are running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  running:
+                    type: boolean
+                    example: true
+      operationId: flask_batteries_included.blueprint_monitoring.app_running
+  /version:
+    get:
+      summary: Get version information
+      description: Get the version number, circleci build number, and git hash.
+      tags:
+      - monitoring
+      responses:
+        '200':
+          description: Version numbers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  circle:
+                    type: string
+                    example: '1234'
+                  hash:
+                    type: string
+                    example: 366c204
+      operationId: flask_batteries_included.blueprint_monitoring.app_version
+  /dhos/v1/short_url:
+    post:
+      summary: Create short URL
+      description: Create a short URL for the URL provided in the request body.
+      tags:
+      - url
+      requestBody:
+        description: URL to shorten
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShortUrlRequest'
+              x-body-name: url_details
+      responses:
+        '200':
+          description: Shortened url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortUrlResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_url_api.blueprint_api.create_short_url
+  /dhos/v1/original_url/{short_form}:
+    get:
+      summary: Get original URL
+      description: Get the original URL using the short form provided in the request.
+      tags:
+      - url
+      parameters:
+      - name: short_form
+        in: path
+        required: true
+        description: Short form of URL
+        schema:
+          type: string
+          example: 7dfh6
+      responses:
+        '200':
+          description: Original url
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OriginalUrlResponse'
+        default:
+          description: Error, e.g. 400 Bad Request, 503 Service Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      operationId: dhos_url_api.blueprint_api.get_original_url
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: HTTP response code
+          example: 404
+        message:
+          type: string
+          description: Message attached to response
+          example: Not Found
+      required:
+      - code
+      description: An error response in json format
+    ShortUrlRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          description: URL to shorten
+          example: http://google.com
+        maximum_uses:
+          type: integer
+          nullable: true
+          description: Maximum number of times the original URL can be retrieved
+          example: 2
+      required:
+      - url
+      description: Short URL request
+    ShortUrlResponse:
+      type: object
+      properties:
+        short_form:
+          type: string
+          description: Short form of original URL
+          example: ja7s9
+      required:
+      - short_form
+      description: Short URL response
+    OriginalUrlResponse:
+      type: object
+      properties:
+        original_url:
+          type: string
+          description: Original URL that was shortened
+          example: http://google.com
+      required:
+      - original_url
+      description: Original URL response
+  responses:
+    BadRequest:
+      description: Bad or malformed request was received
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ServiceUnavailable:
+      description: Service or dependent resource not available
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

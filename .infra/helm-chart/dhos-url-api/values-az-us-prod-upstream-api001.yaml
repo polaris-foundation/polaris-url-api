@@ -1,0 +1,20 @@
+database:
+  dbhost: us-prod-upstream-api001-oriole-db.postgres.database.azure.com
+  dbport: 5432
+  db_user_name: dhos-url@us-prod-upstream-api001-oriole-db
+  db_su_name: postgres@us-prod-upstream-api001-oriole-db
+  db_name: dhos-url
+
+imagePullPolicy: IfNotPresent
+imagetag: r1.12.0
+
+proxy_url: https://api-us-prod.sensynehealth.com
+environment: PRODUCTION
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/x-forwarded-prefix: /dhos-url
+  hostName: api-prod.sensynehealth.local
