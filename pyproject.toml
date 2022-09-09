@@ -3,12 +3,8 @@ name = "dhos-url-api"
 version = "0.0.1"
 description = "URL API for shortening URLs"
 authors = ["Rob Grant <rob.grant@sensynehealth.com>"]
-keywords = ["URL", "DHOS"]
-repository = "https://github.com/draysontechnologies/dhos-url-api"
-
-[[tool.poetry.source]]
-name = "sensynehealth"
-url = "https://pypi.fury.io/sensynehealth/"
+keywords = ["URL", "Polaris"]
+repository = "https://github.com/polaris-foundation/polaris-url-api"
 
 [tool.poetry.dependencies]
 python = "^3.9"
